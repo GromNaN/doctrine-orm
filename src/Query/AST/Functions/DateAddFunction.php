@@ -10,6 +10,7 @@ use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\Query\SqlWalker;
 use Doctrine\ORM\Query\TokenType;
+use Generator;
 
 use function strtolower;
 
@@ -23,6 +24,11 @@ class DateAddFunction extends FunctionNode
     public Node $firstDateExpression;
     public Node $intervalExpression;
     public Node $unit;
+
+    public function getChildNodes(): Generator
+    {
+        yield from self::filterNodes([$this->firstDateExpression, $this->intervalExpression, $this->unit]);
+    }
 
     public function getSql(SqlWalker $sqlWalker): string
     {

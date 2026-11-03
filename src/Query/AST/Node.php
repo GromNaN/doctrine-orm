@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\ORM\Query\AST;
 
 use Doctrine\ORM\Query\SqlWalker;
+use Generator;
 use Stringable;
 
 use function get_debug_type;
@@ -41,6 +42,33 @@ abstract class Node implements Stringable
     public function __toString(): string
     {
         return $this->dump($this);
+    }
+
+    /**
+     * Returns the direct child nodes of this node.
+     *
+     * The default implementation returns no child. Composite nodes override
+     * this method to expose their operands.
+     *
+     * @return Generator<Node|null>
+     */
+    public function getChildNodes(): Generator
+    {
+        yield from [];
+    }
+
+    /**
+     * @param iterable<mixed> $values
+     *
+     * @return Generator<Node|null>
+     */
+    protected static function filterNodes(iterable $values): Generator
+    {
+        foreach ($values as $value) {
+            if ($value instanceof Node || $value === null) {
+                yield $value;
+            }
+        }
     }
 
     public function dump(mixed $value): string

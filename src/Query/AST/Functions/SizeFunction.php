@@ -8,6 +8,7 @@ use Doctrine\ORM\Query\AST\PathExpression;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 use Doctrine\ORM\Query\TokenType;
+use Generator;
 
 use function assert;
 
@@ -24,6 +25,11 @@ class SizeFunction extends FunctionNode
      * @inheritdoc
      * @todo If the collection being counted is already joined, the SQL can be simpler (more efficient).
      */
+    public function getChildNodes(): Generator
+    {
+        yield $this->collectionPathExpression;
+    }
+
     public function getSql(SqlWalker $sqlWalker): string
     {
         assert($this->collectionPathExpression->field !== null);

@@ -7,20 +7,25 @@ namespace Doctrine\ORM\Query\AST\Functions;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\AST\AggregateExpression;
-use Doctrine\ORM\Query\AST\AggregateNode;
 use Doctrine\ORM\Query\AST\ExpressionWithReturnType;
 use Doctrine\ORM\Query\AST\TypedExpression;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
+use Generator;
 
 /**
  * "COUNT" "(" ["DISTINCT"] StringPrimary ")"
  *
  * @phpstan-ignore class.implementsDeprecatedInterface
  */
-final class CountFunction extends FunctionNode implements AggregateNode, ExpressionWithReturnType, TypedExpression
+final class CountFunction extends FunctionNode implements ExpressionWithReturnType, TypedExpression
 {
     private AggregateExpression $aggregateExpression;
+
+    public function getChildNodes(): Generator
+    {
+        yield $this->aggregateExpression;
+    }
 
     public function getSql(SqlWalker $sqlWalker): string
     {

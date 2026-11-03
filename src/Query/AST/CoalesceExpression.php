@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\ORM\Query\AST;
 
 use Doctrine\ORM\Query\SqlWalker;
+use Generator;
 
 /**
  * CoalesceExpression ::= "COALESCE" "(" ScalarExpression {"," ScalarExpression}* ")"
@@ -16,6 +17,11 @@ class CoalesceExpression extends Node
     /** @param mixed[] $scalarExpressions */
     public function __construct(public array $scalarExpressions)
     {
+    }
+
+    public function getChildNodes(): Generator
+    {
+        yield from self::filterNodes($this->scalarExpressions);
     }
 
     public function dispatch(SqlWalker $walker): string

@@ -6,7 +6,7 @@ namespace Doctrine\ORM\Tools\Pagination;
 
 use Doctrine\ORM\Internal\TypeProviderLocator;
 use Doctrine\ORM\Query;
-use Doctrine\ORM\Query\AST\AggregateNode;
+use Doctrine\ORM\Query\AST\AggregateExpression;
 use Doctrine\ORM\Query\AST\Functions\IdentityFunction;
 use Doctrine\ORM\Query\AST\Node;
 use Doctrine\ORM\Query\AST\PathExpression;
@@ -16,8 +16,6 @@ use Doctrine\ORM\Query\TreeWalkerAdapter;
 use RuntimeException;
 
 use function count;
-use function get_object_vars;
-use function is_array;
 use function is_string;
 use function reset;
 
@@ -141,6 +139,10 @@ class LimitSubqueryWalker extends TreeWalkerAdapter
                     $expression = $queryComponents[$expression]['resultVariable'];
                 }
 
+                if (! $expression instanceof Node) {
+                    continue;
+                }
+
                 if ($this->referencesToManyAssociation($expression, $queryComponents)) {
                     throw new RuntimeException('Cannot select distinct identifiers from query with LIMIT and ORDER BY on an expression referencing a fetch joined to-many association. Use output walkers.');
                 }
@@ -152,30 +154,15 @@ class LimitSubqueryWalker extends TreeWalkerAdapter
      * Checks whether an ORDER BY expression contains a path expression that
      * references a fetch joined to-many association.
      *
-     * The DQL AST has no expression visitor, and function nodes, including
-     * custom ones, keep their operands in arbitrary public properties. Only
-     * those public properties are inspected, so custom function nodes must
-     * expose their operands as public properties to be checked.
-     *
      * Aggregations are ignored on purpose: they reduce the joined rows to one
      * row per root entity in the grouped subquery, so they stay safe in a
      * DISTINCT select list.
      *
      * @param mixed[] $queryComponents
      */
-    private function referencesToManyAssociation(mixed $value, array $queryComponents): bool
+    private function referencesToManyAssociation(Node $value, array $queryComponents): bool
     {
-        if (is_array($value)) {
-            foreach ($value as $item) {
-                if ($this->referencesToManyAssociation($item, $queryComponents)) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        if (! $value instanceof Node || $value instanceof AggregateNode) {
+        if ($value instanceof AggregateExpression) {
             return false;
         }
 
@@ -187,8 +174,8 @@ class LimitSubqueryWalker extends TreeWalkerAdapter
                 && $queryComponent['relation']->isToMany();
         }
 
-        foreach (get_object_vars($value) as $property) {
-            if ($this->referencesToManyAssociation($property, $queryComponents)) {
+        foreach ($value->getChildNodes() as $childNode) {
+            if ($childNode !== null && $this->referencesToManyAssociation($childNode, $queryComponents)) {
                 return true;
             }
         }

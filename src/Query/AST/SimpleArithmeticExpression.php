@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\ORM\Query\AST;
 
 use Doctrine\ORM\Query\SqlWalker;
+use Generator;
 
 /**
  * SimpleArithmeticExpression ::= ArithmeticTerm {("+" | "-") ArithmeticTerm}*
@@ -16,6 +17,11 @@ class SimpleArithmeticExpression extends Node
     /** @param mixed[] $arithmeticTerms */
     public function __construct(public array $arithmeticTerms)
     {
+    }
+
+    public function getChildNodes(): Generator
+    {
+        yield from self::filterNodes($this->arithmeticTerms);
     }
 
     public function dispatch(SqlWalker $walker): string

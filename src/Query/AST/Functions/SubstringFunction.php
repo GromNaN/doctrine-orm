@@ -8,6 +8,7 @@ use Doctrine\ORM\Query\AST\Node;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 use Doctrine\ORM\Query\TokenType;
+use Generator;
 
 /**
  * "SUBSTRING" "(" StringPrimary "," SimpleArithmeticExpression "," SimpleArithmeticExpression ")"
@@ -20,6 +21,15 @@ class SubstringFunction extends FunctionNode
 
     public Node|string $firstSimpleArithmeticExpression;
     public Node|string|null $secondSimpleArithmeticExpression = null;
+
+    public function getChildNodes(): Generator
+    {
+        yield from self::filterNodes([
+            $this->stringPrimary,
+            $this->firstSimpleArithmeticExpression,
+            $this->secondSimpleArithmeticExpression,
+        ]);
+    }
 
     public function getSql(SqlWalker $sqlWalker): string
     {

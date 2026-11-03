@@ -9,6 +9,7 @@ use Doctrine\ORM\Query\AST\Node;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 use Doctrine\ORM\Query\TokenType;
+use Generator;
 
 use function assert;
 use function strcasecmp;
@@ -25,6 +26,11 @@ class TrimFunction extends FunctionNode
     public bool $both             = false;
     public string|false $trimChar = false;
     public Node $stringPrimary;
+
+    public function getChildNodes(): Generator
+    {
+        yield $this->stringPrimary;
+    }
 
     public function getSql(SqlWalker $sqlWalker): string
     {

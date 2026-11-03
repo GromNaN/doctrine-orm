@@ -8,6 +8,7 @@ use Doctrine\ORM\Query\AST\Node;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 use Doctrine\ORM\Query\TokenType;
+use Generator;
 
 /**
  * "LOCATE" "(" StringPrimary "," StringPrimary ["," SimpleArithmeticExpression]")"
@@ -20,6 +21,15 @@ class LocateFunction extends FunctionNode
     public Node|string $secondStringPrimary;
 
     public Node|string|bool $simpleArithmeticExpression = false;
+
+    public function getChildNodes(): Generator
+    {
+        yield from self::filterNodes([
+            $this->firstStringPrimary,
+            $this->secondStringPrimary,
+            $this->simpleArithmeticExpression,
+        ]);
+    }
 
     public function getSql(SqlWalker $sqlWalker): string
     {

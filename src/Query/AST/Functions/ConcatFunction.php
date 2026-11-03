@@ -8,6 +8,7 @@ use Doctrine\ORM\Query\AST\Node;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 use Doctrine\ORM\Query\TokenType;
+use Generator;
 
 /**
  * "CONCAT" "(" StringPrimary "," StringPrimary {"," StringPrimary }* ")"
@@ -21,6 +22,12 @@ class ConcatFunction extends FunctionNode
 
     /** @phpstan-var list<Node> */
     public array $concatExpressions = [];
+
+    public function getChildNodes(): Generator
+    {
+        // parse() adds firstStringPrimary and secondStringPrimary to this list.
+        yield from $this->concatExpressions;
+    }
 
     public function getSql(SqlWalker $sqlWalker): string
     {

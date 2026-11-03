@@ -12,6 +12,7 @@ use Doctrine\ORM\Query\AST\TypedExpression;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 use Doctrine\ORM\Query\TokenType;
+use Generator;
 
 /**
  * "LENGTH" "(" StringPrimary ")"
@@ -23,6 +24,11 @@ use Doctrine\ORM\Query\TokenType;
 class LengthFunction extends FunctionNode implements ExpressionWithReturnType, TypedExpression
 {
     public Node $stringPrimary;
+
+    public function getChildNodes(): Generator
+    {
+        yield $this->stringPrimary;
+    }
 
     public function getSql(SqlWalker $sqlWalker): string
     {

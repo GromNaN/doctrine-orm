@@ -8,6 +8,7 @@ use Doctrine\ORM\Query\AST\Node;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 use Doctrine\ORM\Query\TokenType;
+use Generator;
 
 /**
  * "DATE_DIFF" "(" ArithmeticPrimary "," ArithmeticPrimary ")"
@@ -18,6 +19,12 @@ class DateDiffFunction extends FunctionNode
 {
     public Node $date1;
     public Node $date2;
+
+    public function getChildNodes(): Generator
+    {
+        yield $this->date1;
+        yield $this->date2;
+    }
 
     public function getSql(SqlWalker $sqlWalker): string
     {

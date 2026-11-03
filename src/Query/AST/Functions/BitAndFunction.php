@@ -8,6 +8,7 @@ use Doctrine\ORM\Query\AST\Node;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 use Doctrine\ORM\Query\TokenType;
+use Generator;
 
 /**
  * "BIT_AND" "(" ArithmeticPrimary "," ArithmeticPrimary ")"
@@ -18,6 +19,12 @@ class BitAndFunction extends FunctionNode
 {
     public Node $firstArithmetic;
     public Node $secondArithmetic;
+
+    public function getChildNodes(): Generator
+    {
+        yield $this->firstArithmetic;
+        yield $this->secondArithmetic;
+    }
 
     public function getSql(SqlWalker $sqlWalker): string
     {

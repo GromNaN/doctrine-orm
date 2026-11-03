@@ -8,6 +8,7 @@ use Doctrine\ORM\Query\AST\Node;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
 use Doctrine\ORM\Query\TokenType;
+use Generator;
 
 use function sprintf;
 
@@ -19,6 +20,11 @@ use function sprintf;
 class LowerFunction extends FunctionNode
 {
     public Node $stringPrimary;
+
+    public function getChildNodes(): Generator
+    {
+        yield $this->stringPrimary;
+    }
 
     public function getSql(SqlWalker $sqlWalker): string
     {

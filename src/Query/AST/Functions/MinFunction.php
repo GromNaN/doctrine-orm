@@ -5,16 +5,21 @@ declare(strict_types=1);
 namespace Doctrine\ORM\Query\AST\Functions;
 
 use Doctrine\ORM\Query\AST\AggregateExpression;
-use Doctrine\ORM\Query\AST\AggregateNode;
 use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\SqlWalker;
+use Generator;
 
 /**
  * "MIN" "(" ["DISTINCT"] StringPrimary ")"
  */
-final class MinFunction extends FunctionNode implements AggregateNode
+final class MinFunction extends FunctionNode
 {
     private AggregateExpression $aggregateExpression;
+
+    public function getChildNodes(): Generator
+    {
+        yield $this->aggregateExpression;
+    }
 
     public function getSql(SqlWalker $sqlWalker): string
     {

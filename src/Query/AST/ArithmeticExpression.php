@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\ORM\Query\AST;
 
 use Doctrine\ORM\Query\SqlWalker;
+use Generator;
 
 /**
  * ArithmeticExpression ::= SimpleArithmeticExpression | "(" Subselect ")"
@@ -25,6 +26,11 @@ class ArithmeticExpression extends Node
     public function isSubselect(): bool
     {
         return (bool) $this->subselect;
+    }
+
+    public function getChildNodes(): Generator
+    {
+        yield from self::filterNodes([$this->simpleArithmeticExpression, $this->subselect]);
     }
 
     public function dispatch(SqlWalker $walker): string

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\ORM\Query\AST;
 
 use Doctrine\ORM\Query\SqlWalker;
+use Generator;
 
 /**
  * SimpleCaseExpression ::= "CASE" CaseOperand SimpleWhenClause {SimpleWhenClause}* "ELSE" ScalarExpression "END"
@@ -19,6 +20,11 @@ class SimpleCaseExpression extends Node
         public array $simpleWhenClauses = [],
         public mixed $elseScalarExpression = null,
     ) {
+    }
+
+    public function getChildNodes(): Generator
+    {
+        yield from self::filterNodes([$this->caseOperand, ...$this->simpleWhenClauses, $this->elseScalarExpression]);
     }
 
     public function dispatch(SqlWalker $walker): string

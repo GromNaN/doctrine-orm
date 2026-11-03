@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Doctrine\ORM\Query\AST;
 
 use Doctrine\ORM\Query\SqlWalker;
+use Generator;
 
-class AggregateExpression extends Node implements AggregateNode
+class AggregateExpression extends Node
 {
     /** @param bool $isDistinct Some aggregate expressions support distinct, eg COUNT. */
     public function __construct(
@@ -14,6 +15,11 @@ class AggregateExpression extends Node implements AggregateNode
         public Node|string $pathExpression,
         public bool $isDistinct,
     ) {
+    }
+
+    public function getChildNodes(): Generator
+    {
+        yield from self::filterNodes([$this->pathExpression]);
     }
 
     public function dispatch(SqlWalker $walker): string

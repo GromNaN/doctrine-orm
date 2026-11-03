@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\ORM\Query\AST;
 
 use Doctrine\ORM\Query\SqlWalker;
+use Generator;
 
 /**
  * ArithmeticFactor ::= [("+" | "-")] ArithmeticPrimary
@@ -27,6 +28,11 @@ class ArithmeticFactor extends Node
     public function isNegativeSigned(): bool
     {
         return $this->sign === false;
+    }
+
+    public function getChildNodes(): Generator
+    {
+        yield from self::filterNodes([$this->arithmeticPrimary]);
     }
 
     public function dispatch(SqlWalker $walker): string

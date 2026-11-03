@@ -9,6 +9,7 @@ use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\Query\SqlWalker;
 use Doctrine\ORM\Query\TokenType;
+use Generator;
 
 use function assert;
 use function reset;
@@ -24,6 +25,11 @@ class IdentityFunction extends FunctionNode
     public PathExpression $pathExpression;
 
     public string|null $fieldMapping = null;
+
+    public function getChildNodes(): Generator
+    {
+        yield $this->pathExpression;
+    }
 
     public function getSql(SqlWalker $sqlWalker): string
     {
